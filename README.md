@@ -5,6 +5,31 @@
 
 <img src="Documentation/CTAGDRC_Snap.png" width="70%">
 
+---
+
+This repository is a fork which adds a modern CMake system and prebuilt binaries.
+
+*Generated using [Cookiejuce](github.com/madskjeldgaard/Cookiejuce).*
+
+## Download
+
+Download prebuilt binaries in the [Releases]() tab.
+
+## Building
+
+Configure:
+```bash
+# configure
+cmake -S . -B build
+
+# build
+cmake --build build --config Release
+```
+
+The plugins are now copied to your system.
+
+---
+
 <!-- omit in toc -->
 ## Contents
 - [Introduction](#introduction)
