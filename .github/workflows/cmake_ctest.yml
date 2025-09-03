@@ -204,11 +204,11 @@ jobs:
         mv "packaging/Output/${{ env.ARTIFACT_NAME }}.exe" "${{ env.ARTIFACTS_PATH }}/"
 
     - name: Upload Exe (Windows)
-        if: ${{ matrix.name == 'Windows' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.ARTIFACT_NAME }}.exe
-          path: "${{ env.ARTIFACTS_PATH }}/${{ env.ARTIFACT_NAME }}.exe"
+      if: ${{ matrix.name == 'Windows' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.ARTIFACT_NAME }}.exe
+        path: "${{ env.ARTIFACTS_PATH }}/${{ env.ARTIFACT_NAME }}.exe"
 
     - name: Upload Zip (Linux)
       if: ${{ matrix.name == 'Linux' }}
