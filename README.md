@@ -7,7 +7,7 @@
 
 ---
 
-This repository is a fork which adds a modern CMake system and prebuilt binaries.
+This repository is a fork which adds a modern CMake build system and prebuilt binaries.
 
 *Generated using [Cookiejuce](github.com/madskjeldgaard/Cookiejuce).*
 

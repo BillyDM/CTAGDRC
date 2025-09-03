@@ -204,37 +204,37 @@ jobs:
         mv "packaging/Output/${{ env.ARTIFACT_NAME }}.exe" "${{ env.ARTIFACTS_PATH }}/"
 
     - name: Upload Exe (Windows)
-      if: ${{ matrix.name == 'Windows' }}
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ env.ARTIFACT_NAME }}.exe
-        path: '${{ env.ARTIFACTS_PATH }}/${{ env.ARTIFACT_NAME }}.exe'
+        if: ${{ matrix.name == 'Windows' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}.exe
+          path: "${{ env.ARTIFACTS_PATH }}/${{ env.ARTIFACT_NAME }}.exe"
 
     - name: Upload Zip (Linux)
       if: ${{ matrix.name == 'Linux' }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ env.ARTIFACT_NAME }}.zip
-        path: '${{ env.ARTIFACTS_PATH }}/${{ env.ARTIFACT_NAME }}.zip'
+        path: "${{ env.ARTIFACTS_PATH }}/${{ env.ARTIFACT_NAME }}.zip"
 
-    - name: Upload DMG (macOS)
+    - name: Upload pkg (macOS)
       if: ${{ matrix.name == 'macOS' }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.ARTIFACT_NAME }}.dmg
-        path: packaging/${{ env.ARTIFACT_NAME }}.dmg
+        name: ${{ env.ARTIFACT_NAME }}.pkg
+        path: packaging/${{ env.ARTIFACT_NAME }}.pkg
 
-  release:
-    if: contains(github.ref, 'tags/v')
-    runs-on: ubuntu-latest
-    needs: build_and_test
+release:
+  if: contains(github.ref, 'tags/v')
+  runs-on: ubuntu-latest
+  needs: build_and_test
 
-    steps:
+  steps:
     - name: Get Artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
 
     - name: Create Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         prerelease: true
         # download-artifact puts these files in their own dirs...
