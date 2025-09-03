@@ -12,6 +12,10 @@ include(PamplejuceVersion)
 # Configures universal binaries and decides which version of macOS to support
 include(PamplejuceMacOS)
 
+# Disable building arm64 on MacOS for now until support for arm64 in SIMDMath.h
+# is added.
+set(CMAKE_OSX_ARCHITECTURES x86_64)
+
 # Change me! This is the internal name of the project and the name of JUCE's
 # shared code target Note: This cannot have spaces (it may be 2024, but you
 # can't have it all!) Worry not, JUCE's PRODUCT_NAME can have spaces (and is
@@ -50,7 +54,6 @@ include(JUCEDefaults)
 # --remote --merge` to keep it up to date On Github Actions, this is done as a
 # part of actions/checkout
 add_subdirectory(libs/JUCE)
-
 
 # Add any other modules you want modules here, before the juce_add_plugin call
 # juce_add_module(modules/my_module)
