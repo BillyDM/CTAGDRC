@@ -13,7 +13,7 @@ This repository is a fork which adds a modern CMake build system and prebuilt bi
 
 ## Download
 
-Download prebuilt binaries in the [Releases]() tab.
+Download prebuilt binaries in the [Releases](https://github.com/BillyDM/CTAGDRC/releases) tab.
 
 ## Building
 
