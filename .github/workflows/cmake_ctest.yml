@@ -201,7 +201,6 @@ jobs:
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
         with:
           path: packaging/installer.iss
-          options: /O+
 
       - name: Generate Installer
         run: |
