@@ -190,10 +190,21 @@ jobs:
         working-directory: ${{ env.ARTIFACTS_PATH }}
         run: 7z a -tzip "${{ env.ARTIFACT_NAME }}.zip" "-xr!lib${{ env.PRODUCT_NAME }}_SharedCode.a" .
 
-      - name: Generate Installer
+      #- name: Generate Installer
+      #  if: ${{ matrix.name == 'Windows' }}
+      #  run: |
+      #    iscc "packaging\installer.iss"
+      #    mv "packaging/Output/${{ env.ARTIFACT_NAME }}.exe" "${{ env.ARTIFACTS_PATH }}/"
+
+      - name: Compile .ISS to .EXE Installer
         if: ${{ matrix.name == 'Windows' }}
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+        with:
+          path: packaging/installer.iss
+          options: /O+
+
+      - name: Generate Installer
         run: |
-          iscc "packaging\installer.iss"
           mv "packaging/Output/${{ env.ARTIFACT_NAME }}.exe" "${{ env.ARTIFACTS_PATH }}/"
 
       #- name: Codesign with Azure Trusted Signing
