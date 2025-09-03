@@ -1,0 +1,9 @@
+[submodule "libs/JUCE"]
+	path = libs/JUCE
+	url = https://github.com/juce-framework/JUCE
+[submodule "libs/clap-juce-extensions"]
+	path = libs/clap-juce-extensions
+	url = https://github.com/free-audio/clap-juce-extensions.git
+[submodule "cmake-include/sudara-cmake"]
+	path = cmake-include/sudara-cmake
+	url = https://github.com/sudara/cmake-includes.git
