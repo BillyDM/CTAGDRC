@@ -200,7 +200,7 @@ jobs:
         if: ${{ matrix.name == 'Windows' }}
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
         with:
-          path: packaging/installer.iss
+          path: packaging\installer.iss
 
       - name: Generate Installer
         if: ${{ matrix.name == 'Windows' }}
