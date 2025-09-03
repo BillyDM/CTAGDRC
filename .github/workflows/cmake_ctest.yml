@@ -203,6 +203,7 @@ jobs:
           path: packaging/installer.iss
 
       - name: Generate Installer
+        if: ${{ matrix.name == 'Windows' }}
         run: |
           mv "packaging/Output/${{ env.ARTIFACT_NAME }}.exe" "${{ env.ARTIFACTS_PATH }}/"
 
