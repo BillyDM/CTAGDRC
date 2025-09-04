@@ -15,7 +15,7 @@ This repository is a fork which adds a modern CMake build system and prebuilt bi
 
 Download prebuilt binaries in the [Releases](https://github.com/BillyDM/CTAGDRC/releases) tab.
 
-> Note to MacOS users: The binaries are not signed, meaning you may have to tweak system security settings to use it. Also, native Apple silicon is not supported yet, but it is planned.
+> Note to MacOS users: The binaries are not signed, meaning you may have to [disable gatekeeper](https://disable-gatekeeper.github.io/) to use it. Also, native Apple silicon is not supported yet, but it is planned.
 
 ## Building
 
