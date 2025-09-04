@@ -182,9 +182,6 @@ jobs:
           envsubst < distribution.xml.template > distribution.xml
           productbuild --resources ./resources --distribution distribution.xml --timestamp "${{ env.ARTIFACT_NAME }}.pkg"
 
-          xcrun notarytool submit "${{ env.ARTIFACT_NAME }}.pkg" --wait
-          xcrun stapler staple "${{ env.ARTIFACT_NAME }}.pkg"
-
       - name: Zip
         if: ${{ matrix.name == 'Linux' }}
         working-directory: ${{ env.ARTIFACTS_PATH }}
