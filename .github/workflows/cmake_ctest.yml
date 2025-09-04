@@ -167,7 +167,7 @@ jobs:
 
       - name: pkgbuild, Productbuild and Notarize
         if: ${{ matrix.name == 'macOS' }}
-        timeout-minutes: 10
+        timeout-minutes: 5
         run: |
           pkgbuild --identifier "${{ env.BUNDLE_ID }}.au.pkg" --version $VERSION --component "${{ env.AU_PATH }}" --install-location "/Library/Audio/Plug-Ins/Components"  "packaging/${{ env.PRODUCT_NAME }}.au.pkg"
           pkgbuild --identifier "${{ env.BUNDLE_ID }}.vst3.pkg" --version $VERSION --component "${{ env.VST3_PATH }}" --install-location "/Library/Audio/Plug-Ins/VST3" "packaging/${{ env.PRODUCT_NAME }}.vst3.pkg"
@@ -182,6 +182,7 @@ jobs:
           envsubst < distribution.xml.template > distribution.xml
           productbuild --resources ./resources --distribution distribution.xml --timestamp "${{ env.ARTIFACT_NAME }}.pkg"
 
+          xcrun notarytool submit "${{ env.ARTIFACT_NAME }}.pkg" --wait
           xcrun stapler staple "${{ env.ARTIFACT_NAME }}.pkg"
 
       - name: Zip
