@@ -9,7 +9,7 @@
 
 This repository is a fork which adds a modern CMake build system and prebuilt binaries.
 
-*Generated using [Cookiejuce](github.com/madskjeldgaard/Cookiejuce).*
+*Build system based on [Pamplejuce](https://github.com/sudara/pamplejuce)/[Cookiejuce](https://github.com/madskjeldgaard/Cookiejuce).*
 
 ## Download
 
