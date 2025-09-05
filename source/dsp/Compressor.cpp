@@ -17,8 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "include/Compressor.h"
 
-#include "../util/include/SIMDMath.h"
-
 Compressor::~Compressor()
 {
     rawSidechainSignal = nullptr;
@@ -201,7 +199,14 @@ inline void Compressor::applyInputGain(juce::AudioBuffer<float>& buffer, int num
 
 inline float Compressor::calculateAutoMakeup(const float* src, int numSamples)
 {
-    const float sum = SIMDMath::sum(src, numSamples);
+    float sum = 0;
+    const float* end = src + numSamples;
+    while (src != end)
+    {
+        sum += *src;
+        src++;
+    }
+
     smoothedAutoMakeup.process(-sum / static_cast<float>(numSamples));
     return autoMakeupEnabled ? static_cast<float>(smoothedAutoMakeup.getState()) : 0.0f;
 }

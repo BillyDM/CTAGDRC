@@ -16,7 +16,7 @@ env:
   DISPLAY: :0 # linux pluginval needs this
   HOMEBREW_NO_INSTALL_CLEANUP: 1
   SCCACHE_GHA_ENABLED: true
-  SCCACHE_CACHE_MULTIARCH: 0
+  SCCACHE_CACHE_MULTIARCH: 1
   #IPP_DIR: C:\Program Files (x86)\Intel\oneAPI\ipp\latest\lib\cmake\ipp
 
 defaults:
@@ -42,8 +42,7 @@ jobs:
           - name: macOS
             os: macos-14
             pluginval-binary: pluginval.app/Contents/MacOS/pluginval
-            # TODO: add support of arm64
-            extra-flags: -G Ninja -DCMAKE_OSX_ARCHITECTURES="x86_64"
+            extra-flags: -G Ninja -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
           - name: Windows
             os: windows-latest
             pluginval-binary: ./pluginval.exe

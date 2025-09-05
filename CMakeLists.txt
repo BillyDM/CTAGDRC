@@ -12,10 +12,6 @@ include(PamplejuceVersion)
 # Configures universal binaries and decides which version of macOS to support
 include(PamplejuceMacOS)
 
-# Disable building arm64 on MacOS for now until support for arm64 in SIMDMath.h
-# is added.
-set(CMAKE_OSX_ARCHITECTURES x86_64)
-
 # Change me! This is the internal name of the project and the name of JUCE's
 # shared code target Note: This cannot have spaces (it may be 2024, but you
 # can't have it all!) Worry not, JUCE's PRODUCT_NAME can have spaces (and is
@@ -119,13 +115,13 @@ add_library(SharedCode INTERFACE)
 # C++20, please Use cxx_std_23 for C++23 (as of CMake v 3.20)
 target_compile_features(SharedCode INTERFACE cxx_std_20)
 
-add_library(sse3 INTERFACE IMPORTED)
-if(MSVC)
-    target_compile_options(sse3 INTERFACE /arch:SSE3)
-else()
-    target_compile_options(sse3 INTERFACE -msse3)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse3")
-endif()
+#add_library(sse3 INTERFACE IMPORTED)
+#if(MSVC)
+#    target_compile_options(sse3 INTERFACE /arch:SSE3)
+#else()
+#    target_compile_options(sse3 INTERFACE -msse3)
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse3")
+#endif()
 
 # Manually list all .h and .cpp files for the plugin If you are like me, you'll
 # use globs for your sanity. Just ensure you employ CONFIGURE_DEPENDS so the
