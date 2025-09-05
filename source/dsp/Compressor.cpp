@@ -197,16 +197,29 @@ inline void Compressor::applyInputGain(juce::AudioBuffer<float>& buffer, int num
     }
 }
 
-inline float Compressor::calculateAutoMakeup(const float* src, int numSamples)
-{
-    float sum = 0;
-    const float* end = src + numSamples;
-    while (src != end)
-    {
-        sum += *src;
-        src++;
+inline float fastSum(const float* src, int numSamples) {
+    float sum[4] = {0.0, 0.0, 0.0, 0.0};
+
+    int i = 0;
+    int rounddown = numSamples - (numSamples % 4);
+
+    for (; i < rounddown; i += 4) {
+        sum[0] += src[i + 0];
+        sum[1] += src[i + 1];
+        sum[2] += src[i + 2];
+        sum[3] += src[i + 3];
     }
 
+    for (; i < numSamples; i++) {
+        sum[0] += src[i];
+    }
+
+    return sum[0] + sum[1] + sum[2] + sum[3];
+}
+
+inline float Compressor::calculateAutoMakeup(const float* src, int numSamples)
+{
+    const float sum = fastSum(src, numSamples);
     smoothedAutoMakeup.process(-sum / static_cast<float>(numSamples));
     return autoMakeupEnabled ? static_cast<float>(smoothedAutoMakeup.getState()) : 0.0f;
 }
