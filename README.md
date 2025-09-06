@@ -5,15 +5,9 @@
 
 <img src="Documentation/CTAGDRC_Snap.png" width="70%">
 
----
-
-This repository is a fork which adds a modern CMake build system and prebuilt binaries.
-
-*Build system based on [Pamplejuce](https://github.com/sudara/pamplejuce)/[Cookiejuce](https://github.com/madskjeldgaard/Cookiejuce).*
-
 ## Download
 
-Download prebuilt binaries in the [Releases](https://github.com/BillyDM/CTAGDRC/releases) tab.
+Download prebuilt binaries in the [Releases](https://github.com/p-hlp/CTAGDRC/releases) tab.
 
 > Note to MacOS users: The binaries are not signed, meaning you may have to [disable gatekeeper](https://disable-gatekeeper.github.io/) to use it.
 
@@ -27,10 +21,6 @@ cmake -S . -B build
 # build
 cmake --build build --config Release
 ```
-
-The plugins are now copied to your system.
-
----
 
 <!-- omit in toc -->
 ## Contents
