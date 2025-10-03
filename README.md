@@ -7,7 +7,7 @@
 
 ---
 
-This repository is a fork which adds a modern CMake build system and prebuilt binaries.
+The original version of this plugin was developed by p-hlp at: https://github.com/p-hlp/CTAGDRC. I do not take any credit for this plugin. This repository is simply a fork which adds a modern CMake build system and prebuilt binaries.
 
 *Build system based on [Pamplejuce](https://github.com/sudara/pamplejuce)/[Cookiejuce](https://github.com/madskjeldgaard/Cookiejuce).*
 
