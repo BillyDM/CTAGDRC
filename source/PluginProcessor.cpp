@@ -370,8 +370,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout CtagdrcAudioProcessor::creat
                                                            {
                                                                return juce::String(value * 100.0f, 1) + " %";
                                                            }));
-    
-    
+
     params.push_back(std::make_unique<juce::AudioParameterFloat>("schighpass", "SC Highpass",
                                                            logRange(Constants::Parameter::scHighpassStart, Constants::Parameter::scHighpassEnd),
                                                             Constants::Parameter::scHighpassStart,
@@ -379,7 +378,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout CtagdrcAudioProcessor::creat
                                                            juce::AudioProcessorParameter::genericParameter,
                                                            [](float value, float)
                                                            {
-                                                               return juce::String(value, 1) + " Hz";
+                                                                if (value < 20.1) {
+                                                                    return juce::String("Off");
+                                                                } else {
+                                                                    return juce::String(value, 1) + " Hz";
+                                                                }
+                                                               
                                                            }));
 
     return {params.begin(), params.end()};
