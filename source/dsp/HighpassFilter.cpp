@@ -1,4 +1,5 @@
 #include "include/HighpassFilter.h"
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 void HighpassFilter::prepare(const double& sampleRate)
