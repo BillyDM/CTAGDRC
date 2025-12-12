@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "include/MeterBackground.h"
 #include "../util/include/Constants.h"
+#include "juce_core/juce_core.h"
+#include "juce_graphics/juce_graphics.h"
 
 MeterBackground::MeterBackground()
 {
@@ -67,8 +69,11 @@ void MeterBackground::drawIndicators(juce::Graphics& g, float centreX, float cen
         float mapped = juce::jmap(static_cast<float>(val), static_cast<float>(minValue), static_cast<float>(maxValue), sAngle,
                             eAngle);
         mapped -= mapped > 2 * juce::MathConstants<float>::pi ? juce::MathConstants<float>::twoPi : 0.0f;
-        const float x2 = centreX + sin(mapped) * length;
-        const float y2 = centreY - cos(mapped) * length;
+        const float mappedSin = sin(mapped);
+        const float mappedCos = cos(mapped);
+
+        const float x2 = centreX + mappedSin * length;
+        const float y2 = centreY - mappedCos * length;
         const float rX = centreX - x2;
         const float rY = centreY - y2;
         const float rLength = sqrt(juce::square(rX) + juce::square(rY));
@@ -78,6 +83,12 @@ void MeterBackground::drawIndicators(juce::Graphics& g, float centreX, float cen
         const float yCof = nY * 7;
 
         g.drawArrow({x2, y2, x2 - xCof, y2 - yCof}, 2.0f, 0, 0);
+
+        const float textX = centreX + mappedSin * (length + 25.0);
+        const float textY = centreY - mappedCos * (length + 25.0);
+
+        g.drawText(juce::String((indices - i - 1) * -step), textX - 15.0, textY, 30.0, 20.0, juce::Justification::centredTop, false);
+
         val += step;
     }
 }

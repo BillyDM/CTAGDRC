@@ -3,7 +3,7 @@
 <!-- omit in toc -->
 ## An audio compressor plugin created with [JUCE](https://juce.com/)
 
-<img src="Documentation/CTAGDRC_Snap.png" width="70%">
+<img src="Documentation/CTAGDRC_Snap.png">
 
 ---
 
