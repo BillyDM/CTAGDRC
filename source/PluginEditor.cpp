@@ -17,7 +17,7 @@ CtagdrcAudioProcessorEditor::CtagdrcAudioProcessorEditor(CtagdrcAudioProcessor& 
     : AudioProcessorEditor(&p), processor(p), valueTreeState(vts), backgroundApp(juce::Colour(Constants::Colors::bg_App)),
       inGainLSlider(this),
       makeupGainLSlider(this), treshLSlider(this), ratioLSlider(this), kneeLSlider(this), attackLSlider(this),
-      releaseLSlider(this), mixLSlider(this),
+      releaseLSlider(this), mixLSlider(this), sidechainHPSlider(this),
       powerButton("powerButton", juce::DrawableButton::ButtonStyle::ImageOnButtonBackground)
 {
     // Make sure that before the constructor has finished, you've set the
@@ -45,7 +45,7 @@ void CtagdrcAudioProcessorEditor::resized()
     auto area = getLocalBounds().reduced(Constants::Margins::big);
 
     const auto headerHeight = area.getHeight() / 10;
-    const auto btnAreaWidth = area.getWidth() / 5;
+    const auto btnAreaWidth = area.getWidth() / 6;
     const auto btnBotHeight = area.getHeight() / 3;
 
     auto header = area.removeFromTop(headerHeight).reduced(Constants::Margins::small);
@@ -73,8 +73,8 @@ void CtagdrcAudioProcessorEditor::resized()
     leftBtnBox.flexWrap = juce::FlexBox::Wrap::noWrap;
     leftBtnBox.flexDirection = juce::FlexBox::Direction::column;
     leftBtnBox.justifyContent = juce::FlexBox::JustifyContent::spaceAround;
-    leftBtnBox.items.add(juce::FlexItem(attackLSlider).withFlex(1).withMargin(knobMarginSmall));
-    leftBtnBox.items.add(juce::FlexItem(releaseLSlider).withFlex(1).withMargin(knobMarginSmall));
+    leftBtnBox.items.add(juce::FlexItem(mixLSlider).withFlex(1).withMargin(knobMarginSmall));
+    leftBtnBox.items.add(juce::FlexItem(sidechainHPSlider).withFlex(1).withMargin(knobMarginSmall));
     leftBtnBox.items.add(juce::FlexItem(inGainLSlider).withFlex(1).withMargin(knobMarginSmall));
     leftBtnBox.performLayout(lBtnArea.toFloat());
 
@@ -84,7 +84,7 @@ void CtagdrcAudioProcessorEditor::resized()
     rightBtnBox.justifyContent = juce::FlexBox::JustifyContent::spaceAround;
     rightBtnBox.items.add(juce::FlexItem(kneeLSlider).withFlex(1).withMargin(knobMarginSmall));
     rightBtnBox.items.add(juce::FlexItem(ratioLSlider).withFlex(1).withMargin(knobMarginSmall));
-    rightBtnBox.items.add(juce::FlexItem(mixLSlider).withFlex(1).withMargin(knobMarginSmall));
+    rightBtnBox.items.add(juce::FlexItem(makeupGainLSlider).withFlex(1).withMargin(knobMarginSmall));
     rightBtnBox.performLayout(rBtnArea.toFloat());
 
     juce::FlexBox botBtnBox;
@@ -92,7 +92,8 @@ void CtagdrcAudioProcessorEditor::resized()
     botBtnBox.flexDirection = juce::FlexBox::Direction::row;
     botBtnBox.justifyContent = juce::FlexBox::JustifyContent::spaceAround;
     botBtnBox.items.add(juce::FlexItem(treshLSlider).withFlex(1).withMargin(knobMargin));
-    botBtnBox.items.add(juce::FlexItem(makeupGainLSlider).withFlex(1).withMargin(knobMargin));
+    botBtnBox.items.add(juce::FlexItem(attackLSlider).withFlex(1).withMargin(knobMargin));
+    botBtnBox.items.add(juce::FlexItem(releaseLSlider).withFlex(1).withMargin(knobMargin));
     botBtnBox.performLayout(botBtnArea.toFloat());
 
     juce::FlexBox meterBox;
@@ -163,6 +164,10 @@ void CtagdrcAudioProcessorEditor::initWidgets()
     mixLSlider.reset(valueTreeState, "mix");
     mixLSlider.setLabelText("Mix");
 
+    addAndMakeVisible(sidechainHPSlider);
+    sidechainHPSlider.reset(valueTreeState, "schighpass");
+    sidechainHPSlider.setLabelText("SC HP");
+
     addAndMakeVisible(lahButton);
     lahButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colour::fromRGB(245, 124, 0));
     lahButton.setButtonText("LookAhead");
@@ -218,6 +223,7 @@ void CtagdrcAudioProcessorEditor::setGUIState(bool powerState)
     kneeLSlider.setEnabled(powerState);
     makeupGainLSlider.setEnabled(powerState);
     mixLSlider.setEnabled(powerState);
+    sidechainHPSlider.setEnabled(powerState);
     meter.setEnabled(powerState);
     meter.setGUIEnabled(powerState);
     lahButton.setEnabled(powerState);

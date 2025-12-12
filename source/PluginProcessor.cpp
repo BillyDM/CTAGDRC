@@ -11,6 +11,16 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+template <typename ValueT>
+juce::NormalisableRange<ValueT> logRange (ValueT min, ValueT max)
+{
+    ValueT range{ std::log (max / min) };
+    return { min, max,
+        [=](ValueT min, ValueT, ValueT v) { return std::exp (v * range) * min; },
+        [=](ValueT min, ValueT, ValueT v) { return std::log (v / min) / range; }
+    };
+}
+
 //==============================================================================
 CtagdrcAudioProcessor::CtagdrcAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -39,6 +49,7 @@ CtagdrcAudioProcessor::CtagdrcAudioProcessor()
     parameters.addParameterListener("attack", this);
     parameters.addParameterListener("release", this);
     parameters.addParameterListener("mix", this);
+    parameters.addParameterListener("schighpass", this);
 
     gainReduction.set(0.0f);
     currentInput.set(-std::numeric_limits<float>::infinity());
@@ -248,6 +259,7 @@ void CtagdrcAudioProcessor::parameterChanged(const juce::String& parameterID, fl
         compressor.setLookahead(newBool);
     }
     else if (parameterID == "mix") compressor.setMix(newValue);
+    else if (parameterID == "schighpass") compressor.setScHighpass(newValue);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout CtagdrcAudioProcessor::createParameterLayout()
@@ -357,6 +369,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout CtagdrcAudioProcessor::creat
                                                            [](float value, float)
                                                            {
                                                                return juce::String(value * 100.0f, 1) + " %";
+                                                           }));
+    
+    
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("schighpass", "SC Highpass",
+                                                           logRange(Constants::Parameter::scHighpassStart, Constants::Parameter::scHighpassEnd),
+                                                            Constants::Parameter::scHighpassStart,
+                                                           juce::String(),
+                                                           juce::AudioProcessorParameter::genericParameter,
+                                                           [](float value, float)
+                                                           {
+                                                               return juce::String(value, 1) + " Hz";
                                                            }));
 
     return {params.begin(), params.end()};

@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <juce_dsp/juce_dsp.h>
 #include "DelayLine.h"
 #include "LookAhead.h"
+#include "HighpassFilter.h"
 
 /* Compressor-Class:
  * The circruit is modeled after the "ideal" VCA-Compressor
@@ -59,6 +60,9 @@ public:
     // Sets mix 0.0f - 1.0f
     void setMix(float);
 
+    // Sets sidechain highpass 20.0 - 20000.0
+    void setScHighpass(float);
+
     // Sets attack time in milliseconds
     void setAttack(float);
 
@@ -96,6 +100,7 @@ private:
     juce::dsp::ProcessSpec procSpec{-1, 0, 0};
 
     juce::AudioBuffer<float> originalSignal;
+    juce::AudioBuffer<float> highpassedSignal;
     std::vector<float> sidechainSignal;
     float* rawSidechainSignal{nullptr};
 
@@ -104,6 +109,8 @@ private:
     DelayLine delay;
     LookAhead lookahead;
     SmoothingFilter smoothedAutoMakeup;
+    HighpassFilter scHighpassL;
+    HighpassFilter scHighpassR;
 
     double lookaheadDelay{0.005};
     float input{0.0f};

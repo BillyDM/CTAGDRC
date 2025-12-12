@@ -29,12 +29,15 @@ void Compressor::prepare(const juce::dsp::ProcessSpec& ps)
     delay.setDelay(0.005f);
     delay.prepare(ps);
     originalSignal.setSize(2, ps.maximumBlockSize);
+    highpassedSignal.setSize(2, ps.maximumBlockSize);
     sidechainSignal.resize(ps.maximumBlockSize, 0.0f);
     rawSidechainSignal = sidechainSignal.data();
     originalSignal.clear();
     lookahead.prepare(procSpec.sampleRate, lookaheadDelay, ps.maximumBlockSize);
     smoothedAutoMakeup.prepare(ps.sampleRate);
     smoothedAutoMakeup.setAlpha(0.03);
+    scHighpassL.prepare(ps.sampleRate);
+    scHighpassR.prepare(ps.sampleRate);
 }
 
 void Compressor::setPower(bool newPower)
@@ -82,6 +85,12 @@ void Compressor::setMix(float newMix)
     mix = newMix;
 }
 
+void Compressor::setScHighpass(float newScHighpass)
+{
+    scHighpassL.setFreqHz(newScHighpass);
+    scHighpassR.copyCoeffFrom(scHighpassL);
+}
+
 void Compressor::setAutoAttack(bool isEnabled)
 {
     ballistics.setAutoAttack(isEnabled);
@@ -120,69 +129,86 @@ float Compressor::getMaxGainReduction()
 
 void Compressor::process(juce::AudioBuffer<float>& buffer)
 {
-    if (!bypassed)
+    if (bypassed) {
+        scHighpassL.reset();
+        scHighpassR.reset();
+        return;
+    }
+
+    const auto numSamples = buffer.getNumSamples();
+    const auto numChannels = buffer.getNumChannels();
+
+    jassert(numSamples == static_cast<int>(sidechainSignal.size()));
+
+    // Clear any old samples
+    originalSignal.clear();
+    highpassedSignal.clear();
+    juce::FloatVectorOperations::fill(rawSidechainSignal, 0.0f, numSamples);
+    maxGainReduction = 0.0f;
+
+    // Apply input gain
+    applyInputGain(buffer, numSamples);
+
+    // Copy input to temporary buffer which will apply a highpass filter to the sidechain signal
+    for (int i = 0; i < numChannels; ++i)
+        highpassedSignal.copyFrom(i, 0, buffer, i, 0, numSamples);
+
+    // Apply sidechain highpass
+    scHighpassL.process(highpassedSignal.getWritePointer(0), numSamples);
+    if (numChannels > 1) {
+        scHighpassR.process(highpassedSignal.getWritePointer(1), numSamples);
+    }
+
+    // Get max l/r amplitude values and fill sidechain signal
+    juce::FloatVectorOperations::abs(rawSidechainSignal, highpassedSignal.getReadPointer(0), numSamples);
+    if (numChannels > 1) {
+        juce::FloatVectorOperations::abs(highpassedSignal.getWritePointer(0), highpassedSignal.getReadPointer(1), numSamples);
+        juce::FloatVectorOperations::max(rawSidechainSignal, rawSidechainSignal, highpassedSignal.getReadPointer(0), numSamples);
+    }
+
+    // Calculate crest factor on max. amplitude values of input buffer
+    ballistics.processCrestFactor(rawSidechainSignal, numSamples);
+
+    // Compute attenuation - converts side-chain signal from linear to logarithmic domain
+    gainComputer.applyCompressionToBuffer(rawSidechainSignal, numSamples);
+
+    // Smooth attenuation - still logarithmic
+    ballistics.applyBallistics(rawSidechainSignal, numSamples);
+
+    // Get minimum = max. gain reduction from side chain buffer
+    maxGainReduction = juce::FloatVectorOperations::findMinimum(rawSidechainSignal, numSamples);
+
+    // Calculate auto makeup
+    autoMakeup = calculateAutoMakeup(rawSidechainSignal, numSamples);
+
+    // Do lookahead if enabled
+    if (lookaheadEnabled || false)
     {
-        const auto numSamples = buffer.getNumSamples();
-        const auto numChannels = buffer.getNumChannels();
+        // Delay input buffer
+        delay.process(buffer);
 
-        jassert(numSamples == static_cast<int>(sidechainSignal.size()));
+        // Process side-chain (delay + gain reduction fade in)
+        lookahead.process(rawSidechainSignal, numSamples);
+    }
 
-        // Clear any old samples
-        originalSignal.clear();
-        juce::FloatVectorOperations::fill(rawSidechainSignal, 0.0f, numSamples);
-        maxGainReduction = 0.0f;
+    // Add makeup gain and convert side-chain to linear domain
+    for (int i = 0; i < numSamples; ++i)
+        sidechainSignal[i] = juce::Decibels::decibelsToGain(sidechainSignal[i] + makeup + autoMakeup);
 
-        // Apply input gain
-        applyInputGain(buffer, numSamples);
+    // Copy buffer to original signal
+    for (int i = 0; i < numChannels; ++i)
+        originalSignal.copyFrom(i, 0, buffer, i, 0, numSamples);
 
-        // Get max l/r amplitude values and fill sidechain signal
-        juce::FloatVectorOperations::abs(rawSidechainSignal, buffer.getReadPointer(0), numSamples);
-        juce::FloatVectorOperations::max(rawSidechainSignal, rawSidechainSignal, buffer.getReadPointer(1), numSamples);
+    // Multiply attenuation with buffer - apply compression
+    for (int i = 0; i < numChannels; ++i)
+        juce::FloatVectorOperations::multiply(buffer.getWritePointer(i), rawSidechainSignal, buffer.getNumSamples());
 
-        // Calculate crest factor on max. amplitude values of input buffer
-        ballistics.processCrestFactor(rawSidechainSignal, numSamples);
-
-        // Compute attenuation - converts side-chain signal from linear to logarithmic domain
-        gainComputer.applyCompressionToBuffer(rawSidechainSignal, numSamples);
-
-        // Smooth attenuation - still logarithmic
-        ballistics.applyBallistics(rawSidechainSignal, numSamples);
-
-        // Get minimum = max. gain reduction from side chain buffer
-        maxGainReduction = juce::FloatVectorOperations::findMinimum(rawSidechainSignal, numSamples);
-
-        // Calculate auto makeup
-        autoMakeup = calculateAutoMakeup(rawSidechainSignal, numSamples);
-
-        // Do lookahead if enabled
-        if (lookaheadEnabled)
-        {
-            // Delay input buffer
-            delay.process(buffer);
-
-            // Process side-chain (delay + gain reduction fade in)
-            lookahead.process(rawSidechainSignal, numSamples);
-        }
-
-        // Add makeup gain and convert side-chain to linear domain
-        for (int i = 0; i < numSamples; ++i)
-            sidechainSignal[i] = juce::Decibels::decibelsToGain(sidechainSignal[i] + makeup + autoMakeup);
-
-        // Copy buffer to original signal
-        for (int i = 0; i < numChannels; ++i)
-            originalSignal.copyFrom(i, 0, buffer, i, 0, numSamples);
-
-        // Multiply attenuation with buffer - apply compression
-        for (int i = 0; i < numChannels; ++i)
-            juce::FloatVectorOperations::multiply(buffer.getWritePointer(i), rawSidechainSignal, buffer.getNumSamples());
-
-        // Mix dry & wet signal
-        for (int i = 0; i < numChannels; ++i)
-        {
-            float* channelData = buffer.getWritePointer(i); //wet signal
-            juce::FloatVectorOperations::multiply(channelData, mix, numSamples);
-            juce::FloatVectorOperations::addWithMultiply(channelData, originalSignal.getReadPointer(i), 1 - mix, numSamples);
-        }
+    // Mix dry & wet signal
+    for (int i = 0; i < numChannels; ++i)
+    {
+        float* channelData = buffer.getWritePointer(i); //wet signal
+        juce::FloatVectorOperations::multiply(channelData, mix, numSamples);
+        juce::FloatVectorOperations::addWithMultiply(channelData, originalSignal.getReadPointer(i), 1 - mix, numSamples);
     }
 }
 
