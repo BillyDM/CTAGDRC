@@ -43,7 +43,7 @@ void HighpassFilter::process(float* src, int numSamples)
 
     for (int i = 0; i < numSamples; ++i)
     {
-        m_yz1 = (m_a0 * src[i]) + (m_b1 * m_yz1) - m_xz1;
+        m_yz1 = (m_b1 * m_yz1) + (m_a0 * (src[i] - m_xz1));
         m_xz1 = src[i];
         src[i] = m_yz1;
     }
