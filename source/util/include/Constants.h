@@ -79,5 +79,9 @@ namespace Constants
         constexpr float mixStart = 0.0f;
         constexpr float mixEnd = 1.0f;
         constexpr float mixInterval = 0.001f;
+
+        constexpr float scHighpassStart = 20.0f;
+        constexpr float scHighpassEnd = 20000.0f;
+        constexpr float scHighpassInterval = 0.1f;
     }
 }

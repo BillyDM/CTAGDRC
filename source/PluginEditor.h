@@ -55,6 +55,7 @@ private:
     LabeledSlider attackLSlider;
     LabeledSlider releaseLSlider;
     LabeledSlider mixLSlider;
+    LabeledSlider sidechainHPSlider;
 
     juce::TextButton lahButton;
     juce::TextButton autoAttackButton;

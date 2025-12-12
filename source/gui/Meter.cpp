@@ -54,7 +54,7 @@ void Meter::resized()
     auto bounds = getLocalBounds();
     auto boxHeight = (bounds.getHeight() / 10) * 2;
     auto boxArea = bounds.removeFromTop(boxHeight);
-    const juce::FlexItem::Margin comboMargin = juce::FlexItem::Margin(6.0f, 16.0f, 6.0f, 16.0f);
+    const juce::FlexItem::Margin comboMargin = juce::FlexItem::Margin(2.0f, 16.0f, 2.0f, 16.0f);
 
     juce::FlexBox mBox;
     mBox.flexWrap = juce::FlexBox::Wrap::noWrap;
