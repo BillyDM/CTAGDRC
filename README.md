@@ -19,8 +19,16 @@ Download prebuilt binaries in the [Releases](https://github.com/BillyDM/CTAGDRC/
 
 ## Building
 
-Configure:
 ```bash
+# clone repository
+git clone https://github.com/BillyDM/CTAGDRC.git
+
+# go to the project's root directory
+cd CTAGDRC
+
+# download submodules
+git submodule update --init --recursive
+
 # configure
 cmake -S . -B build
 
@@ -28,7 +36,7 @@ cmake -S . -B build
 cmake --build build --config Release
 ```
 
-The plugins are now copied to your system.
+After building, the plugin will automatically be installed on the system.
 
 ---
 
